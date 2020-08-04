@@ -1,16 +1,15 @@
 {
   "manifest_version": 2,
-  "version": "1.1.0",
-  "name": "fbclid Killer",
-  "background": {
-    "persistent": true,
-    "scripts": [
-      "src/background.js"
-    ]
-  },
-  "permissions": [
-    "webRequest",
-    "webRequestBlocking",
-    "<all_urls>"
+  "version": "1.0.0",
+  "name": "FBCLID Killer",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.facebook.com/*"
+      ],
+      "js": [
+        "src/inject.js"
+      ]
+    }
   ]
 }
