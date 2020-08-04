@@ -1,11 +1,14 @@
 {
   "manifest_version": 2,
-  "version": "1.0.0",
   "name": "FBCLID Killer",
+  "version": "1.0.0",
+  "description": "Remove ?fbclid from all Facebook external url",
+  "author": "HitomaruKonpaku",
+  "homepage_url": "https://github.com/HitomaruKonpaku/fbclid-killer",
   "content_scripts": [
     {
       "matches": [
-        "https://*.facebook.com/*"
+        "*://*.facebook.com/*"
       ],
       "js": [
         "src/inject.js"
