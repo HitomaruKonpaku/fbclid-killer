@@ -1,3 +1,3 @@
 # FBCLID Killer
 
-Remove `?fbclid=` from url.
+Remove `?fbclid=` from url
