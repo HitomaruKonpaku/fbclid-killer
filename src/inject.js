@@ -10,9 +10,9 @@ const observer = new MutationObserver(mutations => {
     const addedNodes = mutation.addedNodes
     addedNodes.forEach(node => {
       if (!node.querySelectorAll) return
-      const anchors = Array
-        .from(node.querySelectorAll('a'))
-        .filter(a => a.href)
+      const anchors = !node.href
+        ? Array.from(node.querySelectorAll('a')).filter(a => a.href)
+        : [node]
       anchors.forEach(anchor => {
         const originHref = decodeURIComponent(anchor.href)
         let tempHref = originHref.replace('https://l.facebook.com/l.php?u=', '')
