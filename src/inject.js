@@ -11,32 +11,41 @@ const observer = new MutationObserver(mutations => {
     addedNodes.forEach(node => {
       if (!node.querySelectorAll) return
       const anchors = !node.href
-        ? Array.from(node.querySelectorAll('a')).filter(a => a.href)
+        ? node.querySelectorAll('a')
         : [node]
-      anchors.forEach(anchor => {
-        const originHref = decodeURIComponent(anchor.href)
-        let tempHref = originHref.replace('https://l.facebook.com/l.php?u=', '')
-        const index = tempHref.indexOf('fbclid')
-        if (index >= 0) {
-          tempHref = tempHref.slice(0, index)
-        }
-        let url
-        try {
-          url = new URL(tempHref)
-        } catch (error) {
-          console.error(`Invalid URL '${originHref}'`)
-          return
-        }
-        paramsToRemove.forEach(param => url.searchParams.delete(param))
-        const newHref = url.href
-        console.debug({ new: newHref, org: originHref })
-        anchor.href = newHref
-      })
+      updateAnchors(anchors)
     })
   })
 })
+
+updateAnchors(document.querySelectorAll('a'))
 
 observer.observe(document.body, {
   subtree: true,
   childList: true
 })
+
+function updateAnchors(anchors) {
+  anchors = Array.from(anchors).filter(a => a.href)
+  anchors.forEach(anchor => updateAnchorHref(anchor))
+}
+
+function updateAnchorHref(anchor) {
+  const originHref = decodeURIComponent(anchor.href)
+  let tempHref = originHref.replace('https://l.facebook.com/l.php?u=', '')
+  const index = tempHref.indexOf('fbclid')
+  if (index >= 0) {
+    tempHref = tempHref.slice(0, index)
+  }
+  let url
+  try {
+    url = new URL(tempHref)
+  } catch (error) {
+    console.error(`Invalid URL '${originHref}'`)
+    return
+  }
+  paramsToRemove.forEach(param => url.searchParams.delete(param))
+  const newHref = url.href
+  console.debug([newHref, originHref])
+  anchor.href = newHref
+}
