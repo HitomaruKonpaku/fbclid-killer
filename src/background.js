@@ -8,6 +8,8 @@
 
   function listener(details) {
     const url = global.getCleanUrl(details.url)
-    return { redirectUrl: url }
+    if (url !== details.url) {
+      return { redirectUrl: url }
+    }
   }
 })
