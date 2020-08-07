@@ -1,51 +1,38 @@
-console.debug('FBCLID KILLER')
-
-console.debug = () => { }
-
-const paramsToRemove = ['fbclid', '__tn__', '__cft__[0]']
-Object.freeze(paramsToRemove)
-
-const observer = new MutationObserver(mutations => {
-  mutations.forEach(mutation => {
-    const addedNodes = mutation.addedNodes
-    addedNodes.forEach(node => {
-      if (!node.querySelectorAll) return
-      const anchors = !node.href
-        ? node.querySelectorAll('a')
-        : [node]
-      updateAnchors(anchors)
+(function (global, factory) {
+  console.debug('FBCLID - Inject')
+  factory(global)
+})(this, function (global) {
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      const addedNodes = mutation.addedNodes
+      addedNodes.forEach(node => execNode(node))
     })
   })
-})
 
-updateAnchors(document.querySelectorAll('a'))
+  execNode(document.body)
+  observer.observe(document.body, {
+    subtree: true,
+    childList: true
+  })
 
-observer.observe(document.body, {
-  subtree: true,
-  childList: true
-})
-
-function updateAnchors(anchors) {
-  anchors = Array.from(anchors).filter(a => a.href)
-  anchors.forEach(anchor => updateAnchorHref(anchor))
-}
-
-function updateAnchorHref(anchor) {
-  const originHref = decodeURIComponent(anchor.href)
-  let tempHref = originHref.replace('https://l.facebook.com/l.php?u=', '')
-  const index = tempHref.indexOf('fbclid')
-  if (index >= 0) {
-    tempHref = tempHref.slice(0, index)
+  function execNode(node) {
+    if (node.href) {
+      updateAnchors([node])
+      return
+    }
+    if (!node.querySelectorAll) {
+      return
+    }
+    updateAnchors(node.querySelectorAll('a'))
   }
-  let url
-  try {
-    url = new URL(tempHref)
-  } catch (error) {
-    console.error(`Invalid URL '${originHref}'`)
-    return
+
+  function updateAnchors(anchors) {
+    anchors = Array.from(anchors).filter(a => a.href)
+    anchors.forEach(anchor => updateAnchorHref(anchor))
   }
-  paramsToRemove.forEach(param => url.searchParams.delete(param))
-  const newHref = url.href
-  console.debug([newHref, originHref])
-  anchor.href = newHref
-}
+
+  function updateAnchorHref(anchor) {
+    const url = global.getCleanUrl(anchor.href)
+    anchor.href = url
+  }
+})

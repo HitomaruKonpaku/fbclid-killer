@@ -5,14 +5,27 @@
   "description": "Remove ?fbclid from all Facebook external url",
   "author": "HitomaruKonpaku",
   "homepage_url": "https://github.com/HitomaruKonpaku/fbclid-killer",
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "src/shared.js",
+      "src/background.js"
+    ]
+  },
   "content_scripts": [
     {
       "matches": [
         "*://*.facebook.com/*"
       ],
       "js": [
+        "src/shared.js",
         "src/inject.js"
       ]
     }
+  ],
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
   ]
 }
