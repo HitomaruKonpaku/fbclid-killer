@@ -2,22 +2,43 @@
   console.debug('FBCLID - Shared')
   factory(global)
 })(this, function (global) {
+  const removalParams = ['fbclid', '__cft__[0]', '__tn__', 'c[0]', 'h']
+
   global.getCleanUrl = (originUrl) => {
-    const paramsToRemove = ['fbclid', '__cft__[0]', '__tn__']
+    originUrl = decodeURIComponent(originUrl)
+
+    if (!['facebook', 'fbclid'].some(v => originUrl.includes(v))) {
+      // console.debug('Skip', originUrl)
+      return originUrl
+    }
+
     try {
-      let tmpUrl = decodeURIComponent(originUrl)
-        .replace('https://l.facebook.com/l.php?u=', '')
+      // console.debug('Org', originUrl)
+      const tmpUrl = originUrl.replace('https://l.facebook.com/l.php?u=', '')
+
       let url = new URL(tmpUrl)
-      if (url.searchParams.get('fbclid')) {
-        const index = tmpUrl.indexOf('fbclid=')
-        tmpUrl = tmpUrl.slice(0, index)
-        url = new URL(tmpUrl)
-      }
-      paramsToRemove.forEach(param => url.searchParams.delete(param))
+      removalParams.forEach(param => {
+        const prefix = `${param}=`
+        const searchIndex = url.search.indexOf(prefix)
+        if (searchIndex >= 0) {
+          const search = url.search.substring(0, searchIndex - 1)
+          url.search = search
+        }
+        const pathnameIndex = url.pathname.indexOf(prefix)
+        if (pathnameIndex >= 0) {
+          let pathname = url.pathname.substring(0, pathnameIndex - 1)
+          url.pathname = pathname
+        }
+      })
+
+      url = new URL(url)
+      removalParams.forEach(param => url.searchParams.delete(param))
+
       const newUrl = url.href
+      // console.debug('New', newUrl)
       return newUrl
     } catch (error) {
-      console.error(`Invalid URL '${originUrl}'`)
+      console.error('Error handling url', originUrl)
       return originUrl
     }
   }
