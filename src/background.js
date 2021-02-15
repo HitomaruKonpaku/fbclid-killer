@@ -7,6 +7,11 @@
   chrome.webRequest.onBeforeRequest.addListener(listener, filter, extraInfoSpec)
 
   function listener(details) {
+    const isFbUrl = global.isFbUrl(details.url)
+    if (!isFbUrl) {
+      return
+    }
+
     const url = global.getCleanUrl(details.url)
     if (url !== details.url) {
       return { redirectUrl: url }

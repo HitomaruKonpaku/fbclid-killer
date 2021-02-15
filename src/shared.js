@@ -4,10 +4,16 @@
 })(this, function (global) {
   const removalParams = ['fbclid', '__cft__[0]', '__tn__', 'c[0]', 'h']
 
+  global.isFbUrl = url => {
+    const fragments = ['facebook', 'fbclid']
+    const isValid = fragments.some(v => String(url).includes(v))
+    return isValid
+  }
+
   global.getCleanUrl = (originUrl) => {
     originUrl = decodeURIComponent(originUrl)
 
-    if (!['facebook', 'fbclid'].some(v => originUrl.includes(v))) {
+    if (!global.isFbUrl(originUrl)) {
       // console.debug('Skip', originUrl)
       return originUrl
     }
